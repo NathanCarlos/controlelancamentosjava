@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputScript name="locale-primefaces.js" library="js" />
+	<h:outputStylesheet library="css" name="materialize.css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Controle de Lançamentos</title>
+</h:head>
+<h:body>
+	
+	<script>
+		
+		function oncompleteSave(xhr, status, args) {
+			if (!args.validationFailed) {
+				PF('dgConfirm').hide();
+			}
+		}
+		
+	
+	</script>
+	
+	<nav>
+	<div class="nav-wrapper blue darken-3">
+		<a href="#" class="brand-logo" style="margin-left: 5%;">OnGest</a>
+		<ul id="nav-mobile" class="right hide-on-med-and-down">
+			<li><a href="lancamento.xhtml" style="margin-right: 40%;">Lançamentos</a></li>
+		</ul>
+	</div>
+	</nav>
+	<p:growl id="msgs" showDetail="false" life="7000" sticky="false" />
+	<h4 style="text-align: center;">Sistema Para Controle Financeiro</h4>
+	<p:commandButton value="+ Novo Lançamento"
+		oncomplete="PF('dgConfirm').show()"
+		style="margin-left:5%;margin-bottom:2px;" 
+		update="dgConfirm"
+		actionListener="#{lancamentoMB.doPrepareInsert}"/>
+	<p:dialog header="Lançamento" widgetVar="dgConfirm" modal="true"
+		id="dgConfirm">
+		<h:form id="form">
+			<h:panelGrid columns="2">
+				<h:outputLabel value="Descrição: " />
+				<p:inputText required="true" label="Descrição" maxlength="50"
+					value="#{lancamentoMB.edit.descricao}" />
+
+				<h:outputLabel value="Valor: " />
+				<p:inputNumber required="true" label="Valor"
+					value="#{lancamentoMB.edit.valor}" />
+
+				<h:outputLabel value="Data do Lançamento: " />
+				<p:calendar pattern="dd/MM/yyyy" locale="pt"
+					value="#{lancamentoMB.edit.data}" styleClass="campoObrigatorio"
+					required="true" maxlength="10">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:calendar>
+				<f:facet name="footer">
+					<p:outputPanel layout="block" style="text-align:center">
+						<p:commandButton value="Salvar"
+							actionListener="#{lancamentoMB.doSave}"
+							oncomplete="oncompleteSave(xhr, status, args)" update=":msgs dtRegistros"
+							icon="ui-icon-check" styleClass="blue lighten-1"/>
+
+						<p:commandButton value="Cancelar" onclick="PF('dgConfirm').hide()"
+							icon="ui-icon-close" styleClass="red lighten-1" />
+					</p:outputPanel>
+				</f:facet>
+				<p:calendar pattern="dd/MM/yyyy"
+					value="#{lancamentoMB.edit.dt_criacao}" disabled="true" id="data">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:calendar>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	<p:dataTable value="#{lancamentoMB.resultado}" var="list"
+		id="dtRegistros" style="margin-left:5%;margin-right:5%;">
+
+		<p:column headerText="Descrição">
+			<h:outputText value="#{list.descricao}" />
+		</p:column>
+
+		<p:column headerText="Valor">
+			<h:outputText value="#{list.valor}" />
+		</p:column>
+
+		<p:column headerText="Data">
+			<h:outputText value="#{list.data}" />
+		</p:column>
+		
+		<p:column headerText="Data de Criação">
+			<h:outputText value="#{list.dt_criacao}" />
+		</p:column>
+		
+		<p:column>
+			<p:commandButton icon="ui-icon-pencil" styleClass="blue lighten-1" onclick="PF('dgConfirm').show()"
+				update=":form :msgs :dtRegistros"
+				process="@this"
+				actionListener="#{lancamentoMB.doPrepareEdicao(list)}" />
+			<p:commandButton icon="ui-icon-trash" title="Excluir"
+				actionListener="#{lancamentoMB.doRemove(list)}"
+				update=":msgs :dtRegistros" process="@this dtRegistros"
+				immediate="true" styleClass="red lighten-1" />
+		</p:column>
+	</p:dataTable>
+	<script>
+		var component = document.getElementById("form:data");
+		component.style.visibility = "hidden";
+	</script>
+
+	<footer class="page-footer blue darken-3">
+	<div class="footer-copyright">
+		<div class="container">© 2018 Alpha Technologies.</div>
+	</div>
+	</footer>
+</h:body>
+</html>
